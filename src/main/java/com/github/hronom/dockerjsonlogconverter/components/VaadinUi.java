@@ -41,7 +41,7 @@ public class VaadinUi extends UI {
     private final Button convertButton;
     private final Label orLabel;
     private final Upload upload;
-    private final ProgressBar progressBar;
+    private final Label uploadProgressLabel;
     private final TextArea outputTextArea;
 
     private volatile Path sourceTempFilePath;
@@ -76,9 +76,9 @@ public class VaadinUi extends UI {
         upload.setButtonCaption(getMessageLocalized("upload"));
         upload.setSizeUndefined();
 
-        progressBar = new ProgressBar();
-        progressBar.setWidth(100, Unit.PERCENTAGE);
-        progressBar.setVisible(false);
+        uploadProgressLabel = new Label(getMessageLocalized("upload-progress-label"));
+        uploadProgressLabel.setWidth(100, Unit.PERCENTAGE);
+        uploadProgressLabel.setVisible(false);
 
         outputTextArea = new TextArea();
         outputTextArea.setSizeFull();
@@ -90,7 +90,7 @@ public class VaadinUi extends UI {
         manipulationLayout.addComponent(convertButton);
         manipulationLayout.addComponent(orLabel);
         manipulationLayout.addComponent(upload);
-        manipulationLayout.addComponent(progressBar);
+        manipulationLayout.addComponent(uploadProgressLabel);
         manipulationLayout.setSizeUndefined();
 
         HorizontalLayout resultLayout = new HorizontalLayout();
@@ -127,19 +127,7 @@ public class VaadinUi extends UI {
         upload.addStartedListener(new Upload.StartedListener() {
             @Override
             public void uploadStarted(Upload.StartedEvent event) {
-                progressBar.reset();
-                progressBar.setVisible(true);
-            }
-        });
-        upload.addProgressListener(new Upload.ProgressListener() {
-            long progress;
-            @Override
-            public void updateProgress(long readBytes, long contentLength) {
-                long newProgress = (100 * readBytes) / contentLength;
-                if (progress != newProgress) {
-                    progress = newProgress;
-                    progressBar.setValue(progress * 0.01f);
-                }
+                uploadProgressLabel.setVisible(true);
             }
         });
         upload.addSucceededListener((Upload.SucceededListener) event -> {
@@ -154,7 +142,7 @@ public class VaadinUi extends UI {
                     event.getFilename() + ".txt"
                 );
                 resultLayout.addComponent(downloadFileLink);
-                progressBar.setVisible(false);
+                uploadProgressLabel.setVisible(false);
             } catch (IOException e) {
                 Notification.show(
                     getMessageLocalized("notification-error"),
