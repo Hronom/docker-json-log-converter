@@ -9,6 +9,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
@@ -17,15 +18,18 @@ import com.vaadin.ui.VerticalLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 @Theme("valo")
 @SpringUI
+//@Title("docker-json-log-converter")
 public class VaadinUi extends UI {
     private final Log logger = LogFactory.getLog(getClass());
 
@@ -37,6 +41,7 @@ public class VaadinUi extends UI {
     private final Button convertButton;
     private final Label orLabel;
     private final Upload upload;
+    private final ProgressBar progressBar;
     private final TextArea outputTextArea;
 
     private volatile Path sourceTempFilePath;
@@ -44,9 +49,15 @@ public class VaadinUi extends UI {
     private volatile OutputStream outputStream;
 
     @Autowired
-    public VaadinUi(ConvertingService convertingService, MessageSource messageSource) {
+    public VaadinUi(
+        ConvertingService convertingService,
+        MessageSource messageSource,
+        @Value("${spring.application.name}") String appName
+    ) {
         this.convertingService = convertingService;
         this.messageSource = messageSource;
+
+        this.getPage().setTitle(appName);
 
         mainLabel = new Label(getMessageLocalized("main-label"), ContentMode.HTML);
         mainLabel.setSizeUndefined();
@@ -65,6 +76,10 @@ public class VaadinUi extends UI {
         upload.setButtonCaption(getMessageLocalized("upload"));
         upload.setSizeUndefined();
 
+        progressBar = new ProgressBar();
+        progressBar.setWidth(100, Unit.PERCENTAGE);
+        progressBar.setVisible(false);
+
         outputTextArea = new TextArea();
         outputTextArea.setSizeFull();
     }
@@ -75,6 +90,7 @@ public class VaadinUi extends UI {
         manipulationLayout.addComponent(convertButton);
         manipulationLayout.addComponent(orLabel);
         manipulationLayout.addComponent(upload);
+        manipulationLayout.addComponent(progressBar);
         manipulationLayout.setSizeUndefined();
 
         HorizontalLayout resultLayout = new HorizontalLayout();
@@ -94,7 +110,38 @@ public class VaadinUi extends UI {
         inputTextArea.setPlaceholder(getMessageLocalized("input-text-area"));
         inputTextArea.setValueChangeMode(ValueChangeMode.LAZY);
 
-        upload.setReceiver(createUploadReceiver());
+        upload.setReceiver((Upload.Receiver) (filename, mimeType) -> {
+            try {
+                sourceTempFilePath = Files.createTempFile("", "_source");
+                outputStream = Files.newOutputStream(sourceTempFilePath);
+                return outputStream;
+            } catch (IOException e) {
+                Notification.show(
+                    getMessageLocalized("notification-error"),
+                    Notification.Type.ERROR_MESSAGE
+                );
+                logger.error("Error", e);
+                return null;
+            }
+        });
+        upload.addStartedListener(new Upload.StartedListener() {
+            @Override
+            public void uploadStarted(Upload.StartedEvent event) {
+                progressBar.reset();
+                progressBar.setVisible(true);
+            }
+        });
+        upload.addProgressListener(new Upload.ProgressListener() {
+            long progress;
+            @Override
+            public void updateProgress(long readBytes, long contentLength) {
+                long newProgress = (100 * readBytes) / contentLength;
+                if (progress != newProgress) {
+                    progress = newProgress;
+                    progressBar.setValue(progress * 0.01f);
+                }
+            }
+        });
         upload.addSucceededListener((Upload.SucceededListener) event -> {
             try {
                 targetTempFilePath = Files.createTempFile("", "_processed");
@@ -107,6 +154,7 @@ public class VaadinUi extends UI {
                     event.getFilename() + ".txt"
                 );
                 resultLayout.addComponent(downloadFileLink);
+                progressBar.setVisible(false);
             } catch (IOException e) {
                 Notification.show(
                     getMessageLocalized("notification-error"),
@@ -133,23 +181,6 @@ public class VaadinUi extends UI {
         });
         outputTextArea.setPlaceholder(getMessageLocalized("output-text-area"));
         outputTextArea.setValueChangeMode(ValueChangeMode.LAZY);
-    }
-
-    private Upload.Receiver createUploadReceiver() {
-        return (Upload.Receiver) (filename, mimeType) -> {
-            try {
-                sourceTempFilePath = Files.createTempFile("", "_source");
-                outputStream = Files.newOutputStream(sourceTempFilePath);
-                return outputStream;
-            } catch (IOException e) {
-                Notification.show(
-                    getMessageLocalized("notification-error"),
-                    Notification.Type.ERROR_MESSAGE
-                );
-                logger.error("Error", e);
-                return null;
-            }
-        };
     }
 
     private String getMessageLocalized(String key) {
