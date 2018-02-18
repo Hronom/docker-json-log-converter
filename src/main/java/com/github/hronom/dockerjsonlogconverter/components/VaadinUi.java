@@ -87,10 +87,10 @@ public class VaadinUi extends UI {
         manipulationLayout.addComponent(convertButton);
         manipulationLayout.addComponent(orLabel);
         manipulationLayout.addComponent(upload);
-        manipulationLayout.addComponent(uploadProgressLabel);
         manipulationLayout.setSizeUndefined();
 
         HorizontalLayout resultLayout = new HorizontalLayout();
+        manipulationLayout.addComponent(uploadProgressLabel);
         resultLayout.setSizeFull();
 
         VerticalLayout mainLayout = new VerticalLayout();
