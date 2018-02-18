@@ -1,0 +1,16 @@
+package com.github.hronom.dockerjsonlogconverter.components;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.annotation.Generated;
+
+public class DockerJsonLogRow {
+
+	@JsonProperty("log")
+	public String log;
+
+	@JsonProperty("stream")
+	public String stream;
+
+	@JsonProperty("time")
+	public String time;
+}

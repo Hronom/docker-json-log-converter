@@ -1,0 +1,1 @@
+web: ./target/*.jar -Dserver.port=$PORT -Dspring.profiles.active=prod
