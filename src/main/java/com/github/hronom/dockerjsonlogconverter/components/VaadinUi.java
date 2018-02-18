@@ -73,7 +73,7 @@ public class VaadinUi extends UI {
         upload.setButtonCaption(getMessageLocalized("upload"));
         upload.setSizeUndefined();
 
-        uploadProgressLabel = new Label(getMessageLocalized("upload-progress-label"));
+        uploadProgressLabel = new Label();
         uploadProgressLabel.setWidth(100, Unit.PERCENTAGE);
         uploadProgressLabel.setVisible(false);
 
@@ -124,6 +124,9 @@ public class VaadinUi extends UI {
         upload.addStartedListener(new Upload.StartedListener() {
             @Override
             public void uploadStarted(Upload.StartedEvent event) {
+                inputTextArea.clear();
+                uploadProgressLabel
+                    .setValue(getMessageLocalized("upload-progress-label", event.getFilename()));
                 uploadProgressLabel.setVisible(true);
             }
         });
@@ -168,7 +171,7 @@ public class VaadinUi extends UI {
         outputTextArea.setValueChangeMode(ValueChangeMode.LAZY);
     }
 
-    private String getMessageLocalized(String key) {
-        return messageSource.getMessage(key, new Object[0], this.getLocale());
+    private String getMessageLocalized(String key, String... args) {
+        return messageSource.getMessage(key, args, this.getLocale());
     }
 }
