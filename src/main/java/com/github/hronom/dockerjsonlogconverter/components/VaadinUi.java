@@ -9,7 +9,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
@@ -25,11 +24,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
 
-@Theme("valo")
+@Theme("mytheme")
 @SpringUI
-//@Title("docker-json-log-converter")
 public class VaadinUi extends UI {
     private final Log logger = LogFactory.getLog(getClass());
 

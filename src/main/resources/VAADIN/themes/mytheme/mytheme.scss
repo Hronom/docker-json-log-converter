@@ -1,0 +1,5 @@
+@import "../valo/valo";
+
+.mytheme {
+  @include valo;
+}
