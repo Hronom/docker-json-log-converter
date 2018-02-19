@@ -90,7 +90,6 @@ public class VaadinUi extends UI {
         manipulationLayout.setSizeUndefined();
 
         HorizontalLayout resultLayout = new HorizontalLayout();
-        manipulationLayout.addComponent(uploadProgressLabel);
         resultLayout.setSizeFull();
 
         VerticalLayout mainLayout = new VerticalLayout();
@@ -124,9 +123,14 @@ public class VaadinUi extends UI {
         upload.addStartedListener(new Upload.StartedListener() {
             @Override
             public void uploadStarted(Upload.StartedEvent event) {
+                resultLayout.removeAllComponents();
+
                 inputTextArea.clear();
+
                 uploadProgressLabel
                     .setValue(getMessageLocalized("upload-progress-label", event.getFilename()));
+                manipulationLayout.addComponent(uploadProgressLabel);
+
                 uploadProgressLabel.setVisible(true);
             }
         });
