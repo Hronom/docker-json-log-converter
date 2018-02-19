@@ -1,0 +1,1 @@
+![Heroku](https://heroku-badge.herokuapp.com/?app=docker-json-log-converter)
