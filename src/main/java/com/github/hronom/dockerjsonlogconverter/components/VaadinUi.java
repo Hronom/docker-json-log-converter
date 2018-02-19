@@ -129,7 +129,7 @@ public class VaadinUi extends UI {
 
                 uploadProgressLabel
                     .setValue(getMessageLocalized("upload-progress-label", event.getFilename()));
-                manipulationLayout.addComponent(uploadProgressLabel);
+                resultLayout.addComponent(uploadProgressLabel);
 
                 uploadProgressLabel.setVisible(true);
             }
