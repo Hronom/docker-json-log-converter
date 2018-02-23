@@ -109,6 +109,7 @@ public class VaadinUi extends UI {
         mainLayout.setExpandRatio(resultLayout, 1.0f);
 
         tracker.extend(this);
+        tracker.trackPageview("/");
 
         setContent(mainLayout);
 
