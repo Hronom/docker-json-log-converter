@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.vaadin.googleanalytics.tracking.GoogleAnalyticsTracker;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,6 +42,8 @@ public class VaadinUi extends UI {
     private final Label uploadProgressLabel;
     private final TextArea outputTextArea;
 
+    private final GoogleAnalyticsTracker tracker;
+
     private volatile Path sourceTempFilePath;
     private volatile Path targetTempFilePath;
     private volatile OutputStream outputStream;
@@ -49,7 +52,8 @@ public class VaadinUi extends UI {
     public VaadinUi(
         ConvertingService convertingService,
         MessageSource messageSource,
-        @Value("${spring.application.name}") String appName
+        @Value("${spring.application.name}") String appName,
+        @Value("${trackerId}") String trackerId
     ) {
         this.convertingService = convertingService;
         this.messageSource = messageSource;
@@ -79,6 +83,8 @@ public class VaadinUi extends UI {
 
         outputTextArea = new TextArea();
         outputTextArea.setSizeFull();
+
+        tracker = new GoogleAnalyticsTracker(trackerId);
     }
 
     @Override
@@ -101,6 +107,9 @@ public class VaadinUi extends UI {
         mainLayout.setExpandRatio(inputTextArea, 1.0f);
         mainLayout.setExpandRatio(manipulationLayout, 0.0f);
         mainLayout.setExpandRatio(resultLayout, 1.0f);
+
+        tracker.extend(this);
+
         setContent(mainLayout);
 
         inputTextArea.setPlaceholder(getMessageLocalized("input-text-area"));
