@@ -85,6 +85,8 @@ public class VaadinUi extends UI {
         outputTextArea.setSizeFull();
 
         tracker = new GoogleAnalyticsTracker(trackerId);
+        tracker.extend(this);
+        tracker.trackPageview("/");
     }
 
     @Override
@@ -107,9 +109,6 @@ public class VaadinUi extends UI {
         mainLayout.setExpandRatio(inputTextArea, 1.0f);
         mainLayout.setExpandRatio(manipulationLayout, 0.0f);
         mainLayout.setExpandRatio(resultLayout, 1.0f);
-
-        tracker.extend(this);
-        tracker.trackPageview("/");
 
         setContent(mainLayout);
 
