@@ -7,9 +7,11 @@ import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
@@ -20,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,6 +37,8 @@ public class VaadinUi extends UI {
     private final ConvertingService convertingService;
     private final MessageSource messageSource;
 
+    private final Panel mainPanel;
+
     private final Label mainLabel;
     private final TextArea inputTextArea;
     private final Button convertButton;
@@ -41,6 +46,9 @@ public class VaadinUi extends UI {
     private final Upload upload;
     private final Label uploadProgressLabel;
     private final TextArea outputTextArea;
+
+
+    private final CustomLayout customLayout;
 
     private volatile Path sourceTempFilePath;
     private volatile Path targetTempFilePath;
@@ -50,10 +58,16 @@ public class VaadinUi extends UI {
     public VaadinUi(
         ConvertingService convertingService,
         MessageSource messageSource,
-        @Value("${spring.application.name}") String appName
-    ) {
+        @Value("${spring.application.name}") String appName,
+        @Value(value = "classpath:data/disqus.html") Resource disqusResource
+    ) throws IOException {
         this.convertingService = convertingService;
         this.messageSource = messageSource;
+
+        mainPanel = new Panel();
+
+        customLayout = new CustomLayout(disqusResource.getInputStream());
+        customLayout.setSizeFull();
 
         getPage().setTitle(appName);
 
@@ -98,12 +112,16 @@ public class VaadinUi extends UI {
         mainLayout.addComponent(inputTextArea);
         mainLayout.addComponent(manipulationLayout);
         mainLayout.addComponent(resultLayout);
+        mainLayout.addComponent(customLayout);
         mainLayout.setSizeFull();
         mainLayout.setExpandRatio(inputTextArea, 1.0f);
         mainLayout.setExpandRatio(manipulationLayout, 0.0f);
         mainLayout.setExpandRatio(resultLayout, 1.0f);
+        mainLayout.setExpandRatio(customLayout, 1.0f);
 
-        setContent(mainLayout);
+        mainPanel.setContent(mainLayout);
+
+        setContent(mainPanel);
 
         inputTextArea.setPlaceholder(getMessageLocalized("input-text-area"));
         inputTextArea.setValueChangeMode(ValueChangeMode.LAZY);
