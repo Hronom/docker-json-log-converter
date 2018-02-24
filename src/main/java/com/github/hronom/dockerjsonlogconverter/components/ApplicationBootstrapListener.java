@@ -21,7 +21,7 @@ public class ApplicationBootstrapListener implements BootstrapListener {
     @Autowired
     public ApplicationBootstrapListener(
         @Value(value = "classpath:data/google-analytics.html") Resource googleAnalyticsResource,
-        @Value(value = "classpath:data/google-adsense.html") Resource googleAdsenseResource
+        @Value(value = "classpath:data/google-adsense-ad-unit.html") Resource googleAdsenseResource
     ) throws IOException {
         googleAnalytics =
             StreamUtils
@@ -38,6 +38,7 @@ public class ApplicationBootstrapListener implements BootstrapListener {
 
     @Override
     public void modifyBootstrapPage(BootstrapPageResponse response) {
-        response.getDocument().head().append(googleAnalytics).append(googleAdsense);
+        response.getDocument().head().append(googleAnalytics);
+        response.getDocument().body().prepend(googleAdsense);
     }
 }
