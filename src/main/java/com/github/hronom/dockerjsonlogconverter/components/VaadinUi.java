@@ -1,5 +1,6 @@
 package com.github.hronom.dockerjsonlogconverter.components;
 
+import com.github.hronom.dockerjsonlogconverter.components.docker.json.log.ConvertingService;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ContentMode;
@@ -19,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.vaadin.googleanalytics.tracking.GoogleAnalyticsTracker;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,8 +42,6 @@ public class VaadinUi extends UI {
     private final Label uploadProgressLabel;
     private final TextArea outputTextArea;
 
-    private final GoogleAnalyticsTracker tracker;
-
     private volatile Path sourceTempFilePath;
     private volatile Path targetTempFilePath;
     private volatile OutputStream outputStream;
@@ -52,13 +50,12 @@ public class VaadinUi extends UI {
     public VaadinUi(
         ConvertingService convertingService,
         MessageSource messageSource,
-        @Value("${spring.application.name}") String appName,
-        @Value("${trackerId}") String trackerId
+        @Value("${spring.application.name}") String appName
     ) {
         this.convertingService = convertingService;
         this.messageSource = messageSource;
 
-        this.getPage().setTitle(appName);
+        getPage().setTitle(appName);
 
         mainLabel = new Label(getMessageLocalized("main-label"), ContentMode.HTML);
         mainLabel.setSizeUndefined();
@@ -83,10 +80,6 @@ public class VaadinUi extends UI {
 
         outputTextArea = new TextArea();
         outputTextArea.setSizeFull();
-
-        tracker = new GoogleAnalyticsTracker(trackerId);
-        tracker.extend(this);
-        tracker.trackPageview("/");
     }
 
     @Override

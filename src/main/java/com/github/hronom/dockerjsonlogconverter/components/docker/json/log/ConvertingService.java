@@ -1,4 +1,4 @@
-package com.github.hronom.dockerjsonlogconverter.components;
+package com.github.hronom.dockerjsonlogconverter.components.docker.json.log;
 
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;

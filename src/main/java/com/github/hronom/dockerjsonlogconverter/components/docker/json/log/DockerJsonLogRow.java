@@ -1,4 +1,4 @@
-package com.github.hronom.dockerjsonlogconverter.components;
+package com.github.hronom.dockerjsonlogconverter.components.docker.json.log;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.annotation.Generated;
