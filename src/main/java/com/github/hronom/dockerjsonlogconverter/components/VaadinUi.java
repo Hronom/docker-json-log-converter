@@ -25,6 +25,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,18 +38,7 @@ public class VaadinUi extends UI {
     private final ConvertingService convertingService;
     private final MessageSource messageSource;
 
-    private final Panel mainPanel;
-
-    private final Label mainLabel;
-    private final TextArea inputTextArea;
-    private final Button convertButton;
-    private final Label orLabel;
-    private final Upload upload;
-    private final Label uploadProgressLabel;
-    private final TextArea outputTextArea;
-
-
-    private final CustomLayout customLayout;
+    private final Resource disqusResource;
 
     private volatile Path sourceTempFilePath;
     private volatile Path targetTempFilePath;
@@ -63,41 +53,58 @@ public class VaadinUi extends UI {
     ) throws IOException {
         this.convertingService = convertingService;
         this.messageSource = messageSource;
-
-        mainPanel = new Panel();
-
-        customLayout = new CustomLayout(disqusResource.getInputStream());
-        customLayout.setSizeFull();
+        this.disqusResource = disqusResource;
 
         getPage().setTitle(appName);
-
-        mainLabel = new Label(getMessageLocalized("main-label"), ContentMode.HTML);
-        mainLabel.setSizeUndefined();
-
-        inputTextArea = new TextArea();
-        inputTextArea.setSizeFull();
-
-        convertButton = new Button(getMessageLocalized("convert-button"));
-        convertButton.setSizeUndefined();
-
-        orLabel = new Label(getMessageLocalized("or-label"), ContentMode.HTML);
-        orLabel.setSizeUndefined();
-        orLabel.setHeight(100, Unit.PERCENTAGE);
-
-        upload = new Upload();
-        upload.setButtonCaption(getMessageLocalized("upload"));
-        upload.setSizeUndefined();
-
-        uploadProgressLabel = new Label();
-        uploadProgressLabel.setWidth(100, Unit.PERCENTAGE);
-        uploadProgressLabel.setVisible(false);
-
-        outputTextArea = new TextArea();
-        outputTextArea.setSizeFull();
     }
 
     @Override
     protected void init(VaadinRequest request) {
+        Label mainLabel = new Label(getMessageLocalized("main-label"), ContentMode.HTML);
+        mainLabel.setSizeUndefined();
+
+        TextArea inputTextArea = new TextArea();
+        inputTextArea.setSizeFull();
+        inputTextArea.setWordWrap(false);
+        inputTextArea.setHeight(250, Unit.PIXELS);
+        inputTextArea.setPlaceholder(getMessageLocalized("input-text-area"));
+        inputTextArea.setValueChangeMode(ValueChangeMode.LAZY);
+
+        Button convertButton = new Button(getMessageLocalized("convert-button"));
+        convertButton.setSizeUndefined();
+
+        Label orLabel = new Label(getMessageLocalized("or-label"), ContentMode.HTML);
+        orLabel.setSizeUndefined();
+        orLabel.setHeight(100, Unit.PERCENTAGE);
+
+        Upload upload = new Upload();
+        upload.setButtonCaption(getMessageLocalized("upload"));
+        upload.setSizeUndefined();
+
+        Label uploadProgressLabel = new Label();
+        uploadProgressLabel.setWidth(100, Unit.PERCENTAGE);
+        uploadProgressLabel.setVisible(false);
+
+        TextArea outputTextArea = new TextArea();
+        outputTextArea.setSizeFull();
+        outputTextArea.setWordWrap(false);
+        outputTextArea.setHeight(250, Unit.PIXELS);
+        outputTextArea.setPlaceholder(getMessageLocalized("output-text-area"));
+        outputTextArea.setValueChangeMode(ValueChangeMode.LAZY);
+        outputTextArea.setReadOnly(true);
+
+        CustomLayout customLayout = null;
+        try (InputStream inputStream = disqusResource.getInputStream()) {
+            customLayout = new CustomLayout(inputStream);
+            customLayout.setSizeFull();
+        } catch (IOException e) {
+            logger.error("Error", e);
+            Notification.show(
+                getMessageLocalized("notification-error"),
+                Notification.Type.ERROR_MESSAGE
+            );
+        }
+
         HorizontalLayout manipulationLayout = new HorizontalLayout();
         manipulationLayout.addComponent(convertButton);
         manipulationLayout.addComponent(orLabel);
@@ -119,12 +126,10 @@ public class VaadinUi extends UI {
         mainLayout.setExpandRatio(resultLayout, 1.0f);
         mainLayout.setExpandRatio(customLayout, 1.0f);
 
+        Panel mainPanel = new Panel();
         mainPanel.setContent(mainLayout);
 
         setContent(mainPanel);
-
-        inputTextArea.setPlaceholder(getMessageLocalized("input-text-area"));
-        inputTextArea.setValueChangeMode(ValueChangeMode.LAZY);
 
         upload.setReceiver((Upload.Receiver) (filename, mimeType) -> {
             try {
@@ -140,19 +145,16 @@ public class VaadinUi extends UI {
                 return null;
             }
         });
-        upload.addStartedListener(new Upload.StartedListener() {
-            @Override
-            public void uploadStarted(Upload.StartedEvent event) {
-                resultLayout.removeAllComponents();
+        upload.addStartedListener((Upload.StartedListener) event -> {
+            resultLayout.removeAllComponents();
 
-                inputTextArea.clear();
+            inputTextArea.clear();
 
-                uploadProgressLabel
-                    .setValue(getMessageLocalized("upload-progress-label", event.getFilename()));
-                resultLayout.addComponent(uploadProgressLabel);
+            uploadProgressLabel
+                .setValue(getMessageLocalized("upload-progress-label", event.getFilename()));
+            resultLayout.addComponent(uploadProgressLabel);
 
-                uploadProgressLabel.setVisible(true);
-            }
+            uploadProgressLabel.setVisible(true);
         });
         upload.addSucceededListener((Upload.SucceededListener) event -> {
             try {
@@ -175,7 +177,6 @@ public class VaadinUi extends UI {
                 logger.error("Error", e);
             }
         });
-
         convertButton.addClickListener((Button.ClickListener) event -> {
             try {
                 resultLayout.removeAllComponents();
@@ -191,8 +192,6 @@ public class VaadinUi extends UI {
                 logger.error("Error", e);
             }
         });
-        outputTextArea.setPlaceholder(getMessageLocalized("output-text-area"));
-        outputTextArea.setValueChangeMode(ValueChangeMode.LAZY);
     }
 
     private String getMessageLocalized(String key, String... args) {
