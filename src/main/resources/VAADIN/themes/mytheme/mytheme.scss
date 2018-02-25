@@ -2,4 +2,8 @@
 
 .mytheme {
   @include valo;
+
+  .v-textarea {
+    resize: vertical;
+  }
 }
