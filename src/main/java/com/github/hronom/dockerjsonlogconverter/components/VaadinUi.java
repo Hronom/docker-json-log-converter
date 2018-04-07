@@ -40,9 +40,9 @@ public class VaadinUi extends UI {
 
     private final Resource disqusResource;
 
-    private volatile Path sourceTempFilePath;
-    private volatile Path targetTempFilePath;
-    private volatile OutputStream outputStream;
+    private volatile Path sourceTempFilePath = null;
+    private volatile Path targetTempFilePath = null;
+    private volatile OutputStream outputStream = null;
 
     @Autowired
     public VaadinUi(
@@ -133,6 +133,7 @@ public class VaadinUi extends UI {
 
         upload.setReceiver((Upload.Receiver) (filename, mimeType) -> {
             try {
+                clean();
                 sourceTempFilePath = Files.createTempFile("", "_source");
                 outputStream = Files.newOutputStream(sourceTempFilePath);
                 return outputStream;
@@ -194,7 +195,29 @@ public class VaadinUi extends UI {
         });
     }
 
+    @Override
+    public void detach() {
+        super.detach();
+        try {
+            clean();
+        } catch (Exception e) {
+            logger.error("Error", e);
+        }
+    }
+
     private String getMessageLocalized(String key, String... args) {
         return messageSource.getMessage(key, args, this.getLocale());
+    }
+
+    private void clean() throws IOException {
+        if (outputStream != null) {
+            outputStream.close();
+        }
+        if (sourceTempFilePath != null) {
+            Files.deleteIfExists(sourceTempFilePath);
+        }
+        if (targetTempFilePath != null) {
+            Files.deleteIfExists(targetTempFilePath);
+        }
     }
 }
