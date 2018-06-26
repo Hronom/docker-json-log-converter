@@ -121,7 +121,7 @@ public class RootComponent extends Div implements LocaleChangeObserver {
         mainLayout.setFlexGrow(1.0f, inputTextArea);
         mainLayout.setFlexGrow(0.0f, manipulationLayout);
         mainLayout.setFlexGrow(1.0f, resultLayout);
-        //mainLayout.setFlexGrow(1.0f, customLayout);
+        mainLayout.setFlexGrow(1.0f, disqusComponent);
 
         add(mainLayout);
 
