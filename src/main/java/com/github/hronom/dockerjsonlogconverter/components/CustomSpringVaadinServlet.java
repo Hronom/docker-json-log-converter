@@ -1,17 +1,13 @@
 package com.github.hronom.dockerjsonlogconverter.components;
 
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.spring.server.SpringVaadinServlet;
+import com.vaadin.flow.server.ServiceInitEvent;
+import com.vaadin.flow.server.VaadinServiceInitListener;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
-
-@Component("vaadinServlet")
-public class CustomSpringVaadinServlet extends SpringVaadinServlet {
+@SpringComponent
+public class CustomSpringVaadinServlet implements VaadinServiceInitListener {
     private final ApplicationBootstrapListener applicationBootstrapListener;
 
     @Autowired
@@ -20,13 +16,7 @@ public class CustomSpringVaadinServlet extends SpringVaadinServlet {
     }
 
     @Override
-    protected void servletInitialized() throws ServletException {
-        getService().addSessionInitListener(new SessionInitListener() {
-            @Override
-            public void sessionInit(SessionInitEvent event) throws ServiceException {
-                event.getSession().addBootstrapListener(applicationBootstrapListener);
-            }
-        });
-        super.servletInitialized();
+    public void serviceInit(ServiceInitEvent event) {
+        event.addBootstrapListener(applicationBootstrapListener);
     }
 }

@@ -1,8 +1,7 @@
 package com.github.hronom.dockerjsonlogconverter.components;
 
-import com.vaadin.server.BootstrapFragmentResponse;
-import com.vaadin.server.BootstrapListener;
-import com.vaadin.server.BootstrapPageResponse;
+import com.vaadin.flow.server.BootstrapListener;
+import com.vaadin.flow.server.BootstrapPageResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +19,8 @@ public class ApplicationBootstrapListener implements BootstrapListener {
 
     @Autowired
     public ApplicationBootstrapListener(
-        @Value(value = "classpath:data/google-analytics.html") Resource googleAnalyticsResource,
-        @Value(value = "classpath:data/google-adsense-auto-ads.html") Resource googleAdsenseResource
+        @Value(value = "classpath:/data/google-analytics.html") Resource googleAnalyticsResource,
+        @Value(value = "classpath:/data/google-adsense-auto-ads.html") Resource googleAdsenseResource
     ) throws IOException {
         googleAnalytics =
             StreamUtils
@@ -29,11 +28,6 @@ public class ApplicationBootstrapListener implements BootstrapListener {
         googleAdsense =
             StreamUtils
                 .copyToString(googleAdsenseResource.getInputStream(), StandardCharsets.UTF_8);
-    }
-
-    @Override
-    public void modifyBootstrapFragment(BootstrapFragmentResponse bootstrapFragmentResponse) {
-        // Add bootstrapFragmentResponse modification here.
     }
 
     @Override
