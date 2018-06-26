@@ -3,6 +3,7 @@ package com.github.hronom.dockerjsonlogconverter.components;
 import com.github.hronom.dockerjsonlogconverter.components.docker.json.log.ConvertingService;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
@@ -99,8 +100,7 @@ public class RootComponent extends Div implements LocaleChangeObserver {
         outputTextArea.setValueChangeMode(ValueChangeMode.ON_CHANGE);
         outputTextArea.setReadOnly(true);
 
-        DisqusComponent disqusComponent = new DisqusComponent();
-        disqusComponent.setSizeFull();
+        Html disqusComponent = new Html(disqusResource.getInputStream());
 
         VerticalLayout manipulationLayout = new VerticalLayout();
         manipulationLayout.add(convertButton);
