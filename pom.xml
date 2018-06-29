@@ -23,8 +23,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <vaadin.version>10.0.0</vaadin.version>
-        <vaadin.spring.boot.starter.version>10.0.0</vaadin.spring.boot.starter.version>
+        <vaadin.version>10.0.1</vaadin.version>
+        <vaadin.spring.boot.starter.version>10.0.1</vaadin.spring.boot.starter.version>
         <flow.maven.plugin.version>1.0.0</flow.maven.plugin.version>
         <webapp.directory>src/main/webapp</webapp.directory>
         <start-class>com.github.hronom.dockerjsonlogconverter.DockerJsonLogConverterApplication</start-class>

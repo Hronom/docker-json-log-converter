@@ -3,7 +3,6 @@ package com.github.hronom.dockerjsonlogconverter.components;
 import com.github.hronom.dockerjsonlogconverter.components.docker.json.log.ConvertingService;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
@@ -29,10 +28,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,8 +43,6 @@ public class RootComponent extends Div implements LocaleChangeObserver {
 
     private final ConvertingService convertingService;
 
-    private final Resource disqusResource;
-
     private volatile Path sourceTempFilePath = null;
     private volatile Path targetTempFilePath = null;
     private volatile OutputStream outputStream = null;
@@ -55,11 +50,9 @@ public class RootComponent extends Div implements LocaleChangeObserver {
     @Autowired
     public RootComponent(
         ConvertingService convertingService,
-        @Value("${spring.application.name}") String appName,
-        @Value(value = "classpath:data/disqus.html") Resource disqusResource
+        @Value("${spring.application.name}") String appName
     ) throws IOException {
         this.convertingService = convertingService;
-        this.disqusResource = disqusResource;
 
         setTitle(appName);
 
@@ -100,7 +93,8 @@ public class RootComponent extends Div implements LocaleChangeObserver {
         outputTextArea.setValueChangeMode(ValueChangeMode.ON_CHANGE);
         outputTextArea.setReadOnly(true);
 
-        Html disqusComponent = new Html(disqusResource.getInputStream());
+        DisqusComponent disqusComponent = new DisqusComponent();
+        disqusComponent.setSizeFull();
 
         VerticalLayout manipulationLayout = new VerticalLayout();
         manipulationLayout.add(convertButton);
