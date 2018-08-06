@@ -1,9 +1,0 @@
-@import "../valo/valo";
-
-.mytheme {
-  @include valo;
-
-  .v-textarea {
-    resize: vertical;
-  }
-}
