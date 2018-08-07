@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Docker JSON log converter!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+     (adsbygoogle = window.adsbygoogle || []).push({
+          google_ad_client: "ca-pub-4945384837922804",
+          enable_page_level_ads: true
+     });
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-27215339-5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-27215339-5');
+    </script>
+
+</head>
+<body>
+    <h1 align="center">This is a Docker JSON log converter, enjoy😉</h1>
+
+    <div>
+        <form th:action="@{/}" method="POST" th:object="${processTextForm}">
+            <textarea wrap="soft" autofocus style="width:100%;height:20vh;white-space:pre-wrap;" th:field="*{inputJson}"></textarea>
+            <br>
+            <input type="submit" value="Convert" />
+        </form>
+    </div>
+    <h3>Or for big files:</h3>
+    <div>
+        <form th:action="@{/processFile}" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" />
+            <input type="submit" value="Upload and convert" />
+        </form>
+    </div>
+
+    <h3 th:if="${not #strings.isEmpty(processTextResult)}">Result:</h3>
+
+    <textarea wrap="soft" readonly style="width:100%;height:20vh;white-space:pre-wrap;" th:if="${not #strings.isEmpty(processTextResult)}" th:text="${processTextResult}"></textarea>
+
+    <div id="disqus_thread"></div>
+    <script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://docker-json-log-converter.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</body>
+</html>

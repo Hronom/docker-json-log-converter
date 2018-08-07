@@ -1,14 +1,31 @@
 package com.github.hronom.dockerjsonlogconverter.controllers;
 
+import com.github.hronom.dockerjsonlogconverter.components.docker.json.log.ConvertingService;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,8 +35,42 @@ public class MainController {
 
     private final Resource robotsResource;
 
-    public MainController(@Value(value = "classpath:data/robots.txt") Resource robotsResource) {
+    private final ConvertingService convertingService;
+
+    @Autowired
+    public MainController(
+        @Value(value = "classpath:data/robots.txt") Resource robotsResource,
+        ConvertingService convertingService
+    ) {
         this.robotsResource = robotsResource;
+        this.convertingService = convertingService;
+    }
+
+    @RequestMapping(value = {"/"}, method = {RequestMethod.GET, RequestMethod.POST})
+    public String index(
+        Model model,
+        @ModelAttribute("processTextForm") ProcessTextForm processTextForm
+    ) throws IOException {
+        if (StringUtils.hasText(processTextForm.getInputJson())) {
+            model.addAttribute(
+                "processTextResult",
+                convertingService.toTxt(processTextForm.getInputJson())
+            );
+        }
+        return "index";
+    }
+
+    @PostMapping(value = {"/processFile"})
+    public String processFile(
+        Model model,
+        @ModelAttribute("processTextForm") ProcessTextForm processTextForm,
+        @RequestParam("file") MultipartFile file,
+        HttpServletResponse response
+    ) throws IOException {
+        String fileName = file.getOriginalFilename() + ".txt";
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        convertingService.saveToTxt(file.getInputStream(), response.getWriter());
+        return "index";
     }
 
     @RequestMapping(value = {"/robots", "/robot", "/robot.txt", "/robots.txt", "/null"})
