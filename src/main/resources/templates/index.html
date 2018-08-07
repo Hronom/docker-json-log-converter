@@ -26,6 +26,7 @@
 <body>
     <h1 align="center">This is a Docker JSON log converter, enjoy😉</h1>
 
+    <h3>Put JSON log here:</h3>
     <div>
         <form th:action="@{/}" method="POST" th:object="${processTextForm}">
             <textarea wrap="soft" autofocus style="width:100%;height:20vh;white-space:pre-wrap;" th:field="*{inputJson}"></textarea>
@@ -38,6 +39,7 @@
         <form th:action="@{/processFile}" method="POST" enctype="multipart/form-data">
             <input type="file" name="file" />
             <input type="submit" value="Upload and convert" />
+            (we don't store your files)
         </form>
     </div>
 
