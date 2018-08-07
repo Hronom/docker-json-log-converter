@@ -11,7 +11,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -51,10 +45,10 @@ public class MainController {
         Model model,
         @ModelAttribute("processTextForm") ProcessTextForm processTextForm
     ) throws IOException {
-        if (StringUtils.hasText(processTextForm.getInputJson())) {
+        if (StringUtils.hasText(processTextForm.getJsonInput())) {
             model.addAttribute(
                 "processTextResult",
-                convertingService.toTxt(processTextForm.getInputJson())
+                convertingService.toTxt(processTextForm.getJsonInput())
             );
         }
         return "index";

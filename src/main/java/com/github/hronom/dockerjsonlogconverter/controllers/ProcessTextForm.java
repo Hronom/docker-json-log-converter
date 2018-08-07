@@ -1,13 +1,13 @@
 package com.github.hronom.dockerjsonlogconverter.controllers;
 
 public class ProcessTextForm {
-    private String inputJson;
+    private String jsonInput;
 
-    public String getInputJson() {
-        return inputJson;
+    public String getJsonInput() {
+        return jsonInput;
     }
 
-    public void setInputJson(String inputJson) {
-        this.inputJson = inputJson;
+    public void setJsonInput(String jsonInput) {
+        this.jsonInput = jsonInput;
     }
 }
