@@ -103,7 +103,7 @@
             <!--</activation>-->
             <activation>
                 <property>
-                    <name>env.DYNO</name>
+                    <name>env.production-mode</name>
                 </property>
             </activation>
 
