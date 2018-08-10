@@ -41,8 +41,6 @@ import elemental.css.CSSStyleDeclaration;
 public class RootComponent extends Div implements LocaleChangeObserver {
     private final Log logger = LogFactory.getLog(getClass());
 
-    private final ConvertingService convertingService;
-
     private volatile Path sourceTempFilePath = null;
     private volatile Path targetTempFilePath = null;
     private volatile OutputStream outputStream = null;
@@ -51,9 +49,7 @@ public class RootComponent extends Div implements LocaleChangeObserver {
     public RootComponent(
         ConvertingService convertingService,
         @Value("${spring.application.name}") String appName
-    ) throws IOException {
-        this.convertingService = convertingService;
-
+    ) {
         setTitle(appName);
 
         Label mainLabel = new Label(getTranslation("main-label"));
@@ -61,7 +57,6 @@ public class RootComponent extends Div implements LocaleChangeObserver {
 
         TextArea inputTextArea = new TextArea();
         inputTextArea.setSizeFull();
-        //inputTextArea.setWordWrap(false);
         inputTextArea.setHeight(250 + CSSStyleDeclaration.Unit.PX);
         inputTextArea.setPlaceholder(getTranslation("input-text-area"));
         inputTextArea.setValueChangeMode(ValueChangeMode.ON_CHANGE);
@@ -78,7 +73,6 @@ public class RootComponent extends Div implements LocaleChangeObserver {
 
         Upload upload = new Upload();
         upload.setDropLabel(uploadLabel);
-        //upload.setButtonCaption(getMessageLocalized("upload"));
         upload.setSizeUndefined();
 
         Label uploadProgressLabel = new Label();
@@ -87,13 +81,13 @@ public class RootComponent extends Div implements LocaleChangeObserver {
 
         TextArea outputTextArea = new TextArea();
         outputTextArea.setSizeFull();
-        //outputTextArea.setWordWrap(false);
         outputTextArea.setHeight(250 + CSSStyleDeclaration.Unit.PX);
         outputTextArea.setPlaceholder(getTranslation("output-text-area"));
         outputTextArea.setValueChangeMode(ValueChangeMode.ON_CHANGE);
         outputTextArea.setReadOnly(true);
 
         DisqusComponent disqusComponent = new DisqusComponent();
+        disqusComponent.setEnabled(true);
         disqusComponent.setSizeFull();
 
         VerticalLayout manipulationLayout = new VerticalLayout();
@@ -188,16 +182,6 @@ public class RootComponent extends Div implements LocaleChangeObserver {
             }
         });
     }
-
-//    @Override
-//    public void detach() {
-//        super.detach();
-//        try {
-//            clean();
-//        } catch (Exception e) {
-//            logger.error("Error", e);
-//        }
-//    }
 
     private void clean() throws IOException {
         if (outputStream != null) {
